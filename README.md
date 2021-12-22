@@ -135,22 +135,22 @@ Click “Create” button to apply the pipeline element. Do this for all the f
 ## Test your work - start the pipeline
 Finally you have set-up your environment and we can start running some ACE pipelines, and hopefully even containers. To start your first pipeline, in the Openshift console go to Pipelines->Pipelines->PipelineRuns and click on the three dots next to your ace-build-and-deploy-pipeline-run pipeline run.  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-run.png?raw=true" width="600">  
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-run.png?raw=true" width="800">  
 
  Click "Rerun", cross your fingers and hope that everything was set up correctly.
 
 If you would like, you can track the execution of your pipeline (steps progression and step logs) by clicking on the name of your new pipeline run (it should be in “Running” status).  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-logs.png?raw=true" width="600">  
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-logs.png?raw=true" width="800">  
 
 If the pipeline was successful, you should see a completely green “Task status” for this pipeline run.  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-success.png?raw=true" width="600">  
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-success.png?raw=true" width="800">  
 
 Once successfully completed, you can check if the sample app which was deployed is running and available.
 To do this, on the Openshift console (make sure you are in your project) , go to Networking->Routes and find the route “Location” of your ACE server ( hint: it will have the name of the server which you have configured when editing the pipeline-ace-build-and-deploy.yaml pipeline file ). Open the URL in your browser and add the “/ExampleServer” path at the end.
 If the ACE application is started and listening to requests, you should see the following message (exact view depends on your browser):  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/testaceapp.png?raw=true" width="600"> 
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/testaceapp.png?raw=true" width="800"> 
 
 ## Congratulations!! You have successfully deployed your App Connec Enterprise application using these instructions :-)
