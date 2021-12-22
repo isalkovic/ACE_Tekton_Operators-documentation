@@ -20,8 +20,7 @@ Ideas for improvement:
 - support more configuration types
 - differentiate new deployment from update
 - add option to deploy from custom image build (vs standard Operator deployment with BAR+ standard ACE image)
-- find a public image with zip included, to use in generate-crs steps
-- in ace build step, use a minimal ace image, instead of standard one
+
 
 ## Steps to configure the environment
 
@@ -73,14 +72,19 @@ In your command prompt, enter: 
 git clone https://github.com/isalkovic/ACE_Tekton_Operators.git 
 ```
 
-9. Another requirement of the pipeline (ace-build-bar Task) is to have an appropriate container image, which is suitable to run “ibm int” commands, which we need to execute in order to build the code generated in ACE Toolkit. Ideally, here we would have a custom built minimal ACE image, but so far I did not have the time to do it and test, so I took a shortcut and simply used the standard IBM-provided ACE image, which I slightly modified to include the zip command ( zip is required also in the ace-generate-crs Task - to create a zip file from policy definitions, as specified in the documentation).  OK, so how will we do this? Start from the git repository which you have cloned in the previous step. Inside, there is a Dockerfile named aceonly.docker.base.  
-Using this dockerfile build a new image (for this you will need to have either docker or alternative CLI installed on your machine):  
+9. Another requirement of the pipeline (ace-build-bar Task) is to have an appropriate container image, which is suitable to run “ibm int” commands, which we need to execute in order to build the code generated in ACE Toolkit. We want this image to be as small and light as possible, but IBM does not provide such an image, so we need to build it. To build this light image, I have used some resources provided by Trevor Dolby, IBM ACE Architect.  
+OK, so how will we do this? Start from the git repository which you have cloned in the previous step. Inside, there is a folder named "ace-minimal-image".  
+Using this Dockerfile.aceminimalubuntu dockerfile build a new image (for this you will need to have either docker or alternative CLI installed on your machine):  
 ```
- docker build -t acewithzip -f aceonly.docker.base  
+ docker build -t ace-with-zip -f Dockerfile.aceminimalubuntu .
 ```
   After building the image, tag it with appropriate tag, so that you can push the image to your Openshift image registry:  
+```
  docker tag acewithzip $IMAGEREPOSITORY/$PROJECT/ace-with-zip:latest  
-  Next, we need to tag and push our image to the internal Openshift registry. First, we need to make sure that the registry is exposed and that we know it’s exposed address.  You can check if your registry is exposed if there is a registry route in the project openshift-image-registry. Make a note of that route and we will continue to reference it as $IMAGEREPOSITORY     
+```
+  Next, we need to tag and push our image to the internal Openshift registry.  
+
+  First, we need to make sure that the registry is exposed and that we know it’s exposed address.  You can check if your registry is exposed if there is a registry route in the project openshift-image-registry. Make a note of that route and we will continue to reference it as $IMAGEREPOSITORY     
 If your Openshift registry is not exposed, you first have to expose it using the following oc command:  
 ```
 oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge  
@@ -97,8 +101,8 @@ docker push $IMAGEREPOSITORY/$PROJECT/ace-with-zip:latest
 CHEAT SHEET FOR PODMAN ALTERNATIVE::  
 ```
 podman login -u openshift -p $(oc whoami -t) --tls-verify=false $IMAGEREPOSITORY  
-podman build --tls-verify=false -t acewithzip -f aceonly.docker.base .  
-podman tag acewithzip $IMAGEREPOSITORY/$PROJECT/ace-with-zip:latest  
+podman build -t ace-with-zip -f Dockerfile.aceminimalubuntu .  
+podman tag ace-with-zip $IMAGEREPOSITORY/$PROJECT/ace-with-zip:latest  
 podman push --tls-verify=false $IMAGEREPOSITORY/$PROJECT/ace-with-zip:latest 
 ```
 10. After you have cloned the repository, navigate to “pipeline” directory of this repository. You will need to do some modifications to pipeline elements definitions, in order for the pipeline to run successfully on your cluster. At minimal, do the following modifications:
