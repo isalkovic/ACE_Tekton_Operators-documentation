@@ -39,19 +39,20 @@ This action will add a new section in your Openshift console - "Pipelines" will 
 
 3. Since we will be using Nexus to store the BAR files that we build - we also need to install and configure Nexus. We will start by installing the "Nexus Repository Operator", which can be found again in the Operators->Operator hub - search for the "Nexus Repository Operator", click on it and install it in your $PROJECT . 
  
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true" width="300">
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true" width="300">  
 
 4. After installing the Nexus Operator, we need to also create a new Nexus instance, using this operator. In the Openshift console, go to Operators->Installed operators and click on the Nexus Repository Operator.  
 
 <img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/NR%20NexusRepo.png?raw=true" width="300"> 
 
 On the "NexusRepo" tab, click the button "Create NexusRepo". Change the name if you like and click “Create” to create a new instance of Nexus repository.
-￼
+
 4. Since we want to access our Nexus repository from outside the cluster, we need to expose it, using a route . In the Openshift console, go to Networking->Routes and click on the "Create route" button . Give this route a name of your choice, select the nexus service under “Service” and select the only available Target port (should be 8081) . Click the “Create” button to create a new route.  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/nexus-route.png?raw=true" width="300"> 
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/nexus-route.png?raw=true" width="600"> 
 
-On the next screen you will see the details of the new route. Under location, make a note of the Nexus route URL - we will reference it as $NEXUSURL - you will need it later. Also, click on this URL to open it in your browser and to test that the Nexus repo is up and running and available. If the Nexus repository is started successfully (it may take a couple of minutes), the Nexus UI will appear. In the top-right corner, click the button to sign-in to Nexus using default credentials ( admin / admin123 ) -> default wizard starts - click to allow anonymous access to the repo.
+On the next screen you will see the details of the new route. Under location, make a note of the Nexus route URL - we will reference it as $NEXUSURL - you will need it later. Also, click on this URL to open it in your browser and to test that the Nexus repo is up and running and available. If the Nexus repository is started successfully (it may take a couple of minutes), the Nexus UI will appear. In the top-right corner, click the button to sign-in to Nexus using default credentials ( admin / admin123 ) -> default wizard starts - click to allow anonymous access to the repo.  
+
 7. Next, we must create a new Nexus repository, where we will be storing the BAR files. In Nexus UI, Go to settings->Repository->Repositories and click on the “Create repository” button.  
 
 ![New Nexus repository](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus-newRepo.png?raw=true)  
@@ -64,7 +65,7 @@ On the bottom, click the “Create Repository” button.
 In the Openshift console, go to Storage->PersistentVolumeClaims and click on the button “Create PersistentVolumeClaim”. Select appropriate storage class, for size put 1GiB and give it a name of your choice - we will reference it as $PVCNAME - while leaving other parameters default.  
  Click the button “Create” and make sure that the status of your PVC is “Bound”.  
 
-<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/PVC.png?raw=true" width="300"> 
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/PVC.png?raw=true" width="600"> 
 
 9. As a next step, you will clone the Git repository, which contains code example, configuration example and pipeline definitions - mostly because of the pipelines, which you need to modify and apply on the Openshift cluster. For this you will need the git CLI. 
 In your command prompt, enter:   
