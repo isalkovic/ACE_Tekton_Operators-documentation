@@ -32,23 +32,28 @@ In Openshift, create a new project with the name of your choice. In further inst
 In the Openshift console, go to Operators->Operator hub and search "Red Hat Openshift Pipelines" - when you find it, click on it, and install the Openshift Pipelines Operator.  
 ![RH Openshift pipelines Operator](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Red%20Hat%20OpenShift%20Pipelines.png?raw=true)  
 This action will add a new section in your Openshift console - "Pipelines" will appear in the menu to the left.  
-<center> ![RH Openshift pipelines menu](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Pipelines-menu.png?raw=true)</center>
+![RH Openshift pipelines menu](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Pipelines-menu.png?raw=true)
 
 3. Since we will be using Nexus to store the BAR files that we build - we also need to install and configure Nexus. We will start by installing the "Nexus Repository Operator", which can be found again in the Operators->Operator hub - search for the "Nexus Repository Operator", click on it and install it in your $PROJECT .  
-<center><img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true" alt="drawing" width="250"/></center>
+![Nexus Repository Operator](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true)
 
-4. After installing the Nexus Operator, we need to also create a new Nexus instance, using this operator. In the Openshift console, go to Operators->Installed operators and click on the Nexus Repository Operator. On the "NexusRepo" tab, click the button "Create NexusRepo". Change the name if you like and click “Create” to create a new instance of Nexus repository.
+4. After installing the Nexus Operator, we need to also create a new Nexus instance, using this operator. In the Openshift console, go to Operators->Installed operators and click on the Nexus Repository Operator.  
+![New Nexus repo instance](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/NR%20NexusRepo.png?raw=true)  
+On the "NexusRepo" tab, click the button "Create NexusRepo". Change the name if you like and click “Create” to create a new instance of Nexus repository.
 ￼
-4. Since we want to access our Nexus repository from outside the cluster, we need to expose it, using a route . In the Openshift console, go to Networking->Routes and click on the "Create route" button . Give this route a name of your choice, select the nexus service under “Service” and select the only available Target port (should be 8081) . Click the “Create” button to create a new route. On the next screen you will see the details of the new route. Under location, make a note of the Nexus route URL - we will reference it as $NEXUSURL - you will need it later. Also, click on this URL to open it in your browser and to test that the Nexus repo is up and running and available. If the Nexus repository is started successfully (it may take a couple of minutes), the Nexus UI will appear. In the top-right corner, click the button to sign-in to Nexus using default credentials ( admin / admin123 ) -> default wizard starts - click to allow anonymous access to the repo.
-7. Next, we must create a new Nexus repository, where we will be storing the BAR files. In Nexus UI, Go to settings->Repository->Repositories and click on the “Create repository” button.
-￼
+4. Since we want to access our Nexus repository from outside the cluster, we need to expose it, using a route . In the Openshift console, go to Networking->Routes and click on the "Create route" button . Give this route a name of your choice, select the nexus service under “Service” and select the only available Target port (should be 8081) . Click the “Create” button to create a new route.  
+![Expose Nexus using a route](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/nexus-route.png?raw=true)  
+On the next screen you will see the details of the new route. Under location, make a note of the Nexus route URL - we will reference it as $NEXUSURL - you will need it later. Also, click on this URL to open it in your browser and to test that the Nexus repo is up and running and available. If the Nexus repository is started successfully (it may take a couple of minutes), the Nexus UI will appear. In the top-right corner, click the button to sign-in to Nexus using default credentials ( admin / admin123 ) -> default wizard starts - click to allow anonymous access to the repo.
+7. Next, we must create a new Nexus repository, where we will be storing the BAR files. In Nexus UI, Go to settings->Repository->Repositories and click on the “Create repository” button.  
+![New Nexus repository](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus-newRepo.png?raw=true)  
 Select "maven2(hosted)" as type and proceed to give your repo a name - we will reference it as $NEXUSREPOSITORY.
 Under Hosted->"Deployment policy" change default to “Allow redeploy”. This will make it easier to run the demo - you will be allowed to upload the same bar more than once (which can happen if you do not change the code between builds/deploys). Also, set the “Layout policy” to “Permissive” - this will make Nexus more flexible towards the path that you choose for the upload of your bar file - for demo it is fine like this.
 On the bottom, click the “Create Repository” button.
 
 8. Before proceeding to create the pipeline and pipeline elements, first you will need to define a Persistent Volume Claim (PVC) on your Openshift cluster. PVC is required by the pipeline, since this pipeline needs to exchange data between different pipeline Tasks - i.e. after you clone the repository and it’s files, they are later used in another Task to build the .bar file). To do this, we need persistent storage, since each pipeline Task runs as a separate container instance and as such is ephemeral.  Make sure that you are in the project which you have created earlier - $PROJECT.  
 In the Openshift console, go to Storage->PersistentVolumeClaims and click on the button “Create PersistentVolumeClaim”.  Select appropriate storage class, for size put 1GiB and give it a name of your choice - we will reference it as $PVCNAME - while leaving other parameters default.  
- Click the button “Create” and make sure that the status of your PVC is “Bound”.
+ Click the button “Create” and make sure that the status of your PVC is “Bound”.  
+![New PVC](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/PVC.png?raw=true)
 
 9. As a next step, you will clone the Git repository, which contains code example, configuration example and pipeline definitions - mostly because of the pipelines, which you need to modify and apply on the Openshift cluster. For this you will need the git CLI.  
 In your command prompt, enter: git clone https://github.com/isalkovic/ACE_Tekton_Operators.git 
@@ -84,24 +89,31 @@ podman push --tls-verify=false default-route-openshift-image-registry.apps.ocp12
 
 12. After you have made the appropriate changes, proceed with applying these pipeline definitions (yaml files) to your Openshift cluster.  
 In the command prompt, enter (you will need to have oc CLI installed before you can do this):  
-oc login yourClusterDetails (in the top-right corner of the Openshift console, click on your username and after that click of the “Copy login command” in the menu. This will take you to a new browser tab, where you need to click display token and from there copy the “oc login …” command, which is specific for your user and your cluster.)  
+oc login yourClusterDetails (in the top-right corner of the Openshift console, click on your username and after that click of the “Copy login command” in the menu.  
+  ![OC Login command](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/oclogincmd.png?raw=true)  
+This will take you to a new browser tab, where you need to click display token and from there copy the “oc login …” command, which is specific for your user and your cluster.)  
 oc project $PROJECT (first, you need to switch to your OCP project)  
 oc apply -f pipelineElementName.yaml , where you change the name of the file, for each of the files in the pipeline directory.  
-  As an alternative to running oc commands, you can do the same thing through the Openshift console. In the top-right corner of the console UI, click on the “+” (import YAML) button, and paste the contents of the yaml file. Click “Create” button to apply the pipeline element.  Do this for all the files in the pipeline directory.
+  As an alternative to running oc commands, you can do the same thing through the Openshift console. In the top-right corner of the console UI, click on the “+” (import YAML) button, and paste the contents of the yaml file.  
+![OC import YAML](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/ocimportyaml.png?raw=true)  
+Click “Create” button to apply the pipeline element.  Do this for all the files in the pipeline directory.
 
 ## Test your work - start the pipeline
-Finally you have set-up your environment and we can start running some ACE pipelines, and hopefully even containers. To start your first pipeline, in the Openshift console go to Pipelines->Pipelines->PipelineRuns and click on the three dots next to your ace-build-and-deploy-pipeline-run pipeline run:
-
+Finally you have set-up your environment and we can start running some ACE pipelines, and hopefully even containers. To start your first pipeline, in the Openshift console go to Pipelines->Pipelines->PipelineRuns and click on the three dots next to your ace-build-and-deploy-pipeline-run pipeline run.  
+![Run Pipeline](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-run.png?raw=true)  
  Click "Rerun", cross your fingers and hope that everything was set up correctly.
 
-If you would like, you can track the execution of your pipeline (steps progression and step logs) by clicking on the name of your new pipeline run (it should be in “Running” status).
+If you would like, you can track the execution of your pipeline (steps progression and step logs) by clicking on the name of your new pipeline run (it should be in “Running” status).  
+![Pipeline logs](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-logs.png?raw=true)  
 
+If the pipeline was successful, you should see a completely green “Task status” for this pipeline run.  
 
-
-If the pipeline was successful, you should see a completely green “Task status” for this pipeline run, like on this sample image:
-
+![Pipeline success](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/pipeline-success.png?raw=true)  
 
 Once successfully completed, you can check if the sample app which was deployed is running and available.
 To do this, on the Openshift console (make sure you are in your project) , go to Networking->Routes and find the route “Location” of your ACE server ( hint: it will have the name of the server which you have configured when editing the pipeline-ace-build-and-deploy.yaml pipeline file ).  Open the URL in your browser and add the “/ExampleServer” path at the end.
-If the ACE application is started and listening to requests, you should see the following message (exact view depends on your browser):
+If the ACE application is started and listening to requests, you should see the following message (exact view depends on your browser):  
 
+![ACE app test](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/testaceapp.png?raw=true)
+
+## Congratulations!! You have successfully deployed your App Connec Enterprise application using these instructions :-)
