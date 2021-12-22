@@ -38,8 +38,7 @@ This action will add a new section in your Openshift console - "Pipelines" will 
 ![RH Openshift pipelines menu](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Pipelines-menu.png?raw=true)
 
 3. Since we will be using Nexus to store the BAR files that we build - we also need to install and configure Nexus. We will start by installing the "Nexus Repository Operator", which can be found again in the Operators->Operator hub - search for the "Nexus Repository Operator", click on it and install it in your $PROJECT .  
-
-![Nexus Repository Operator](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true)
+<img src="https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/Nexus%20Repository%20Operator.png?raw=true" width="300">
 
 4. After installing the Nexus Operator, we need to also create a new Nexus instance, using this operator. In the Openshift console, go to Operators->Installed operators and click on the Nexus Repository Operator.  
 
@@ -85,8 +84,8 @@ If your Openshift registry is not exposed, you first have to expose it using the
 oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge  
 ```  
 Again, make a note of the new route which was created. In case of issues with docker login and self-signed certificate, a quick workaround could be to use podman instead of docker as described here: https://sgitario.github.io/docker-push-registry-unsecure  
- Next,  you need to login to your Openshift registry:  
- ```
+ Next,  you need to login to your Openshift registry:
+```
 docker login -u openshift -p $(oc whoami -t) $IMAGEREPOSITORY  
 ```
 And finally, push the image to the registry:  
@@ -117,9 +116,13 @@ oc login yourClusterDetails (in the top-right corner of the Openshift console, c
   
   ![OC Login command](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/oclogincmd.png?raw=true)  
   
-This will take you to a new browser tab, where you need to click display token and from there copy the “oc login …” command, which is specific for your user and your cluster.)  
+This will take you to a new browser tab, where you need to click display token and from there copy the “oc login …” command, which is specific for your user and your cluster.)
+```  
 oc project $PROJECT (first, you need to switch to your OCP project)  
-oc apply -f pipelineElementName.yaml , where you change the name of the file, for each of the files in the pipeline directory.  
+oc apply -f pipelineElementName.yaml 
+```
+where you change the name of the file, for each of the files in the pipeline directory.  
+
   As an alternative to running oc commands, you can do the same thing through the Openshift console. In the top-right corner of the console UI, click on the “+” (import YAML) button, and paste the contents of the yaml file.  
 
 ![OC import YAML](https://github.com/isalkovic/ACE_Tekton_Operators-documentation/blob/main/images/ocimportyaml.png?raw=true)  
