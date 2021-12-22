@@ -1,4 +1,4 @@
-### IBM App Connect Enterprise - Build and deploy using Git, Nexus, Tekton and ACE Operator
+# IBM App Connect Enterprise - Build and deploy using Git, Nexus, Tekton and ACE Operator
 
 ## Purpose of the document
 This document describes detailed steps on how to set up an Openshift tekton pipeline and required environment, which will:
