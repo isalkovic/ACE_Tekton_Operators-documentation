@@ -102,8 +102,9 @@ podman tag acewithzip default-route-openshift-image-registry.apps.ocp12.tec.cz.i
 podman push --tls-verify=false default-route-openshift-image-registry.apps.ocp12.tec.cz.ibm.com/ace-ivo/ace-with-zip:latest 
 ```
 11. After you have cloned the repository, navigate to “pipeline” directory of this repository. You will need to do some modifications to pipeline elements definitions, in order for the pipeline to run successfully on your cluster. At minimal, do the following modifications:
+
 | File name | Changes to be made |
-| ----------- | ----------- |
+| -------------------- | ----------- |
 | pipeline-ace-build-and-deploy.yaml	 | Modify the default value of parameter “deployment-namespace” to match the name of your Openshift $PROJECT. Modify the default value of parameter “nexus-repository-name” to match the name of your Openshift $NEXUSREPOSITORY. Find parameter “nexus-server-base-url” and modify it to the Nexus base URL of your Nexus instance. Normally, this should be the $NEXUSURL URL which is the URL of your Nexus route, which you noted earlier. |
 | pipelinerun-ace-build-and-deploy-run.yaml | Only in the case that you decided to change the name of the Persistent Volume Claim (PVC) , which you have created earlier, make a change to spec.workspaces.persistentVolumeClaim.claimName parameter, to match the name you have chosen. |  
 | task-ace-build-bar.yaml | Update the spec.steps.image parameter, to be pointing to your ace image which you have built previously - so correct repository address, project and image name and tag. |
